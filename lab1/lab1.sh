@@ -20,4 +20,4 @@ case "$src" in
     *.cpp) g++ -o "$output" "srcname" ;;
 esac
 
-mv "$outname" "$srcdir/"
+mv "$output" "$srcdir/"
