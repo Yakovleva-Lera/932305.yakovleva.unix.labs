@@ -11,7 +11,7 @@ while :; do
     current_file=""
     
     result=$(
-        flock -x 9 || exit 1
+        flock -x 9
         
         i=1
         while [ $i -le 999 ]; do
