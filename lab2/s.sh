@@ -19,7 +19,7 @@ while :; do
             p="$S/$f"
             if [ ! -e "$p" ]; then
                 echo "$I $((C + 1))" > "$p"
-		printf "%s" "$f"
+				printf "%s" "$f"
                 exit 0
             fi
             i=$((i + 1))
