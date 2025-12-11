@@ -1,7 +1,7 @@
 #!/bin/sh
 S=/shared
 L=$S/.lock
-I=hostname
+I=$(hostname)
 C=0
 
 mkdir "$S"
