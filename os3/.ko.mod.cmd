@@ -1,0 +1,1 @@
+savedcmd_/home/lera/unix/932305.yakovleva.unix.labs/os3/ko.mod := printf '%s\n'   ko.o | awk '!x[$$0]++ { print("/home/lera/unix/932305.yakovleva.unix.labs/os3/"$$0) }' > /home/lera/unix/932305.yakovleva.unix.labs/os3/ko.mod

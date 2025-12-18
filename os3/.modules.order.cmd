@@ -1,0 +1,1 @@
+savedcmd_/home/lera/unix/932305.yakovleva.unix.labs/os3/modules.order := {   echo /home/lera/unix/932305.yakovleva.unix.labs/os3/ko.o; :; } > /home/lera/unix/932305.yakovleva.unix.labs/os3/modules.order

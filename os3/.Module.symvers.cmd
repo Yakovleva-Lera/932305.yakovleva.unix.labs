@@ -1,0 +1,1 @@
+savedcmd_/home/lera/unix/932305.yakovleva.unix.labs/os3/Module.symvers :=  scripts/mod/modpost -M -m -a      -o /home/lera/unix/932305.yakovleva.unix.labs/os3/Module.symvers -T /home/lera/unix/932305.yakovleva.unix.labs/os3/modules.order -i Module.symvers -e 

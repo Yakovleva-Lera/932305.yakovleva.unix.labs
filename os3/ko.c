@@ -5,12 +5,13 @@
 #include <linux/uaccess.h>
 #include <linux/version.h>
 
-int init_module(void) {
-	pr_info("Welcome to Tomsk\n");
+static int __init tsulab_init(void) {
+	pr_info("Welcome to the Tomsk State University\n");
 	return 0;
 }
-void cleanup_module(void) {
-	pr_info("Unloding the TSU Linux Module\n");
+
+static void __exit tsulab_exit(void) {
+	pr_info("Tomsk State University forever!\n");
 }
 
 module_init(tsulab_init);
