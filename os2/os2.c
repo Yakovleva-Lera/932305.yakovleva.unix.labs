@@ -10,7 +10,6 @@
 #define PORT 3333
 #define BUFFER_SIZE 1024
 
-// Signal handler declaration
 volatile sig_atomic_t wasSigHup = 0;
 volatile sig_atomic_t running = 1;
 int active_socket = -1;
@@ -24,7 +23,11 @@ void sigIntHandler(int sig) {
 }
 
 int main() {
-    signal(SIGINT, sigIntHandler);
+    
+    struct sigaction sa_int;
+    memset(&sa_int, 0, sizeof(sa_int));
+    sa_int.sa_handler = sigIntHandler;
+    sigaction(SIGINT, &sa_int, NULL);  
 
     int server_fd = socket(AF_INET, SOCK_STREAM, 0);
     int opt = 1;
@@ -38,17 +41,15 @@ int main() {
     bind(server_fd, (struct sockaddr *)&address, sizeof(address));
     listen(server_fd, 1);
 
-    // Signal handler registration
     struct sigaction sa;
     sigaction(SIGHUP, NULL, &sa);
     sa.sa_handler = sigHupHandler;
     sa.sa_flags |= SA_RESTART;
     sigaction(SIGHUP, &sa, NULL);
 
-    // Signal blocking
     sigset_t blockedMask, origMask;
     sigemptyset(&blockedMask);
-    sigaddset(&blockedMask, SIGHUP);
+    sigaddset(&blockedMask, SIGHUP);  
     sigprocmask(SIG_BLOCK, &blockedMask, &origMask);
 
     printf("Server started on port %d. PID: %d\n", PORT, getpid());
@@ -74,6 +75,10 @@ int main() {
             if (wasSigHup) {
                 printf("Received SIGHUP signal\n");
                 wasSigHup = 0;
+            }
+            
+            if (!running) {
+                break;  
             }
             continue;
         }
@@ -103,7 +108,6 @@ int main() {
 
             if (bytes_read == 0) {
                 printf("Connection closed by client\n");
-                
                 close(active_socket);
                 active_socket = -1;
             } else {
