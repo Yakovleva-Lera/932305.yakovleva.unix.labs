@@ -67,7 +67,7 @@ static const struct file_operations proc_file_fops = {
 #endif
 
 static int __init tsulab_init(void) {
-	pr_info("TSU Lab: Mars constellation tracker loaded (astronomical mode)\n");
+	pr_info("Welcome to the Tomsk State University\n");
 	our_proc_file = proc_create(procfs_name, 0444, NULL, &proc_file_fops);
 	if (!our_proc_file) {
 		pr_err("Failed to create /proc/%s\n", procfs_name);
@@ -78,7 +78,7 @@ static int __init tsulab_init(void) {
 
 static void __exit tsulab_exit(void) {
 	proc_remove(our_proc_file);
-	pr_info("TSU Lab: Mars tracker unloaded\n");
+	pr_info("Tomsk State University forever!\n");
 }
 
 MODULE_LICENSE("GPL");

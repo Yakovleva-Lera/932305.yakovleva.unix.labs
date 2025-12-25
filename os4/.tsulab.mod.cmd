@@ -1,0 +1,1 @@
+savedcmd_/home/lera/unix/932305.yakovleva.unix.labs/os4/tsulab.mod := printf '%s\n'   tsulab.o | awk '!x[$$0]++ { print("/home/lera/unix/932305.yakovleva.unix.labs/os4/"$$0) }' > /home/lera/unix/932305.yakovleva.unix.labs/os4/tsulab.mod

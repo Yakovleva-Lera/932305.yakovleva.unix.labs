@@ -1,0 +1,1 @@
+savedcmd_/home/lera/unix/932305.yakovleva.unix.labs/os4/tsulab.ko := ld -r -m elf_x86_64 -z noexecstack --no-warn-rwx-segments --build-id=sha1  -T scripts/module.lds -o /home/lera/unix/932305.yakovleva.unix.labs/os4/tsulab.ko /home/lera/unix/932305.yakovleva.unix.labs/os4/tsulab.o /home/lera/unix/932305.yakovleva.unix.labs/os4/tsulab.mod.o
