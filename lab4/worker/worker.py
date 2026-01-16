@@ -8,50 +8,45 @@ from kafka import KafkaConsumer
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-KAFKA_BOOTSTRAP_SERVERS = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092")
 running = True
 
-def shutdown_handler(signum, frame):
+def handle_exit(sig, frame):
     global running
-    logger.info("Signal received. Finalizing current task...")
+    logger.info("Shutdown signal received...")
     running = False
 
-signal.signal(signal.SIGTERM, shutdown_handler)
-signal.signal(signal.SIGINT, shutdown_handler)
+signal.signal(signal.SIGINT, handle_exit)
+signal.signal(signal.SIGTERM, handle_exit)
 
 def main():
     consumer = None
     while consumer is None:
         try:
             consumer = KafkaConsumer(
-                "image-processing",
-                bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS,
-                group_id="image-workers",
+                "image-tasks",
+                bootstrap_servers=os.getenv("KAFKA_BOOTSTRAP_SERVERS"),
+                group_id="workers-group",
                 enable_auto_commit=False,
-                value_deserializer=lambda x: json.loads(x.decode('utf-8')),
-                request_timeout_ms=5000
+                value_deserializer=lambda x: json.loads(x.decode('utf-8'))
             )
         except Exception:
-            logger.info("Waiting for Kafka...")
             time.sleep(2)
 
-    try:
-        for message in consumer:
-            if not running:
-                break
-            
-            url = message.value.get("url")
-            logger.info(f"Start processing: {url}")
-            time.sleep(5)
-            
-            consumer.commit()
-            logger.info(f"Committed: {url}")
-            
-            if not running:
-                break
-    finally:
-        consumer.close()
-        logger.info("Worker gracefully shut down.")
+    for msg in consumer:
+        if not running:
+            break
+        
+        logger.info(f"Start processing: {msg.value['url']}")
+        time.sleep(10)
+        
+        consumer.commit()
+        logger.info(f"Finished: {msg.value['url']}")
+        
+        if not running:
+            break
+
+    consumer.close()
+    logger.info("Bye!")
 
 if __name__ == "__main__":
     main()
