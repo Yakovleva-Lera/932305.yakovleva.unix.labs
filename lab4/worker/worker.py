@@ -20,13 +20,20 @@ signal.signal(signal.SIGTERM, shutdown_handler)
 signal.signal(signal.SIGINT, shutdown_handler)
 
 def main():
-    consumer = KafkaConsumer(
-        "image-processing",
-        bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS,
-        group_id="image-workers",
-        enable_auto_commit=False,
-        value_deserializer=lambda x: json.loads(x.decode('utf-8'))
-    )
+    consumer = None
+    while consumer is None:
+        try:
+            consumer = KafkaConsumer(
+                "image-processing",
+                bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS,
+                group_id="image-workers",
+                enable_auto_commit=False,
+                value_deserializer=lambda x: json.loads(x.decode('utf-8')),
+                request_timeout_ms=5000
+            )
+        except Exception:
+            logger.info("Waiting for Kafka...")
+            time.sleep(2)
 
     try:
         for message in consumer:
@@ -35,7 +42,7 @@ def main():
             
             url = message.value.get("url")
             logger.info(f"Start processing: {url}")
-            time.sleep(10)
+            time.sleep(5)
             
             consumer.commit()
             logger.info(f"Committed: {url}")
@@ -46,5 +53,5 @@ def main():
         consumer.close()
         logger.info("Worker gracefully shut down.")
 
-if name == "__main__":
+if __name__ == "__main__":
     main()
