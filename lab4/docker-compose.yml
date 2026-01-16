@@ -1,19 +1,23 @@
 services:
   zookeeper:
-    image: bitnami/zookeeper:latest
+    image: confluentinc/cp-zookeeper:latest
     environment:
-      - ALLOW_ANONYMOUS_LOGIN=yes
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
 
   kafka:
-    image: bitnami/kafka:latest
+    image: confluentinc/cp-kafka:latest
     ports:
       - "9092:9092"
-    environment:
-      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
-      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
-      - ALLOW_PLAINTEXT_LISTENER=yes
     depends_on:
       - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
 
   api:
     build: ./api
@@ -22,11 +26,11 @@ services:
     depends_on:
       - kafka
     environment:
-      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
 
   worker:
     build: ./worker
     depends_on:
       - kafka
     environment:
-      - KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092

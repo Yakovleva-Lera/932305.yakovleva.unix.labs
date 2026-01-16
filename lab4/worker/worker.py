@@ -13,6 +13,7 @@ running = True
 
 def shutdown_handler(signum, frame):
     global running
+    logger.info("Signal received. Finalizing current task...")
     running = False
 
 signal.signal(signal.SIGTERM, shutdown_handler)
@@ -33,16 +34,17 @@ def main():
                 break
             
             url = message.value.get("url")
-            logger.info(f"Processing: {url}")
-            time.sleep(5)
+            logger.info(f"Start processing: {url}")
+            time.sleep(10)
             
             consumer.commit()
-            logger.info(f"Finished: {url}")
+            logger.info(f"Committed: {url}")
             
             if not running:
                 break
     finally:
         consumer.close()
+        logger.info("Worker gracefully shut down.")
 
 if name == "__main__":
     main()
