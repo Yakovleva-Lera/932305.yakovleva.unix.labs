@@ -5,17 +5,18 @@ import os
 import json
 
 app = FastAPI()
+
 KAFKA_BOOTSTRAP_SERVERS = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092")
 producer = KafkaProducer(
     bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS,
     value_serializer=lambda v: json.dumps(v).encode('utf-8')
 )
 
-class TaskRequest(BaseModel):
+class ImageRequest(BaseModel):
     url: str
 
 @app.post("/process")
-async def process_task(request: TaskRequest):
+async def process_image(request: ImageRequest):
     try:
         producer.send("image-processing", {"url": request.url})
         return {"status": "accepted"}
