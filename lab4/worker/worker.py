@@ -6,21 +6,21 @@ import logging
 from kafka import KafkaConsumer
 
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("Worker")
 
 running = True
 
-def handle_exit(sig, frame):
+def stop_handler(sig, frame):
     global running
-    logger.info("Shutdown signal received...")
+    logger.info("Graceful shutdown initiated...")
     running = False
 
-signal.signal(signal.SIGINT, handle_exit)
-signal.signal(signal.SIGTERM, handle_exit)
+signal.signal(signal.SIGTERM, stop_handler)
+signal.signal(signal.SIGINT, stop_handler)
 
 def main():
     consumer = None
-    while consumer is None:
+    while consumer is None and running:
         try:
             consumer = KafkaConsumer(
                 "image-tasks",
@@ -30,23 +30,34 @@ def main():
                 value_deserializer=lambda x: json.loads(x.decode('utf-8'))
             )
         except Exception:
-            time.sleep(2)
+            logger.info("Waiting for Kafka...")
+            time.sleep(3)
 
-    for msg in consumer:
-        if not running:
-            break
-        
-        logger.info(f"Start processing: {msg.value['url']}")
-        time.sleep(10)
-        
-        consumer.commit()
-        logger.info(f"Finished: {msg.value['url']}")
-        
-        if not running:
-            break
+    if not running:
+        return
 
-    consumer.close()
-    logger.info("Bye!")
+    logger.info("Worker started, waiting for messages...")
+    
+    try:
+        for message in consumer:
+            if not running:
+                break
+            
+            data = message.value
+            url = data.get("url")
+            
+            logger.info(f"PROCESSING START: {url}")
+            time.sleep(10)
+            
+            consumer.commit()
+            logger.info(f"PROCESSING DONE: {url}")
+            
+            if not running:
+                break
+    finally:
+        if consumer:
+            consumer.close()
+        logger.info("Worker stopped cleanly.")
 
 if __name__ == "__main__":
     main()
