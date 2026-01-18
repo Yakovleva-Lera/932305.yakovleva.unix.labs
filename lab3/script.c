@@ -33,7 +33,6 @@ char* find_or_add(unsigned char hash[SHA256_DIGEST_LENGTH], const char* path) {
         entry = entry->next;
     }
     HashEntry* new_node = malloc(sizeof(HashEntry));
-    new_node->hash[0] = 0; 
     memcpy(new_node->hash, hash, SHA256_DIGEST_LENGTH);
     new_node->first_path = strdup(path);
     new_node->next = hash_table[idx];
